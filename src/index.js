@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("./cors");
 const connectDB = require('./mongodb')
-const authController = require("./authController/register");
+const router = require("./routes/index");
 
 app.use(express.json());
 
@@ -12,8 +12,9 @@ app.use(cors);
 // اتصال به دیتابیس
 connectDB();
 
-//authController
-app.use("/auth", authController);
+//router
+app.use("/api",router);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

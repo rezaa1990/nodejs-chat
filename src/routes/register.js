@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/user"); 
+const User = require("../models/user");
 const bcrypt = require("bcrypt");
 // ثبت‌نام کاربر جدید
 router.post("/register", async (req, res) => {
   try {
-    console.log("register")
+    console.log("register");
     const { username, email, password } = req.body;
 
     // بررسی آیا کاربر با ایمیل وارد شده قبلاً ثبت‌نام کرده یا نه
