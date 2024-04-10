@@ -8,17 +8,27 @@ function initializeSocket(server) {
     },
   });
 
+  // Dictionary to store messages for each room
+  const roomsMessages = {};
+
   io.on("connection", (socket) => {
     console.log("A user connected");
 
-    // Joining a room
-    const room = "room100";
+    socket.on("joinRoom", (room) => {
+      console.log('data:',room);
       socket.join(room);
+      // Initialize message array for each room if not already exist
+      if (!roomsMessages[room]) {
+        roomsMessages[room] = [];
+      }
+      console.log(`User joined room: ${room}`);
+    });
 
-    // Listening for messages from a specific room
     socket.on("sendMessage", (data) => {
       const { room, message } = data;
-      io.to(room).emit("message", message);
+      // Add message to the respective room's messages array
+      roomsMessages[room].push(message);
+      io.to(room).emit("message", { room, message }); // Send room along with message
       console.log(`Message received in room ${room}: ${message}`);
     });
 
