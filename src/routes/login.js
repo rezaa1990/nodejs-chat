@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
     });
 
     // اعتبارسنجی موفقیت‌آمیز و ارسال توکن به کلاینت
-    res.status(200).json({ message: "ورود موفقیت‌آمیز.", token });
+    res.status(200).json({ message: "ورود موفقیت‌آمیز.", token, user });
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ message: "مشکلی در ورود کاربر رخ داده است." });
