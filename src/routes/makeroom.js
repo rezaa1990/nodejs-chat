@@ -5,7 +5,7 @@ const Room = require("./../models/room");
 
 router.post("/makeroom", async (req, res) => {
   try {
-    console.log("req.body",req.body)
+    console.log("req.body", req.body);
     let { loginedUser, selectedUser } = req.body;
 
     loginedUser = await User.findOne({ email: loginedUser.email });
@@ -23,7 +23,13 @@ router.post("/makeroom", async (req, res) => {
         members: [loginedUser._id, selectedUser._id],
       });
       await newRoom.save();
+      loginedUser.rooms.push(newRoom._id);
+      await loginedUser.save();
+      selectedUser.rooms.push(newRoom._id);
+      await selectedUser.save();
+      console.log("usersss:", loginedUser, selectedUser);
       res.json({ room: newRoom });
+      
     }
   } catch (error) {
     console.error("خطا در ساخت چت روم:", error);
