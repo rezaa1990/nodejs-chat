@@ -33,7 +33,10 @@ function initializeSocket(server) {
         // Add message to the respective room's messages array
         room.messages.push(message);
         await room.save();
-        io.to(receivedRoom).emit("message", { room: receivedRoom, message });
+        let newData = [
+          {"name":room.name,"messages":message},
+        ]
+        io.to(receivedRoom).emit("message", { room, newData });
         console.log(`Message received in room ${receivedRoom}: ${message}`);
       } catch (error) {
         console.error("Error occurred while handling sendMessage:", error);
