@@ -19,6 +19,7 @@ function initializeSocket(server) {
     });
 
     const Room = require("./models/room");
+    const User = require("./models/user");
 
     socket.on("sendMessage", async (data) => {
       const { room: receivedRoom, message, loginedUser, selectedUser } = data;
@@ -33,14 +34,43 @@ function initializeSocket(server) {
         // Add message to the respective room's messages array
         room.messages.push(message);
         await room.save();
-        let newData = [
-          {"name":room.name,"messages":message},
-        ]
+        let newData = [{ name: room.name, messages: message }];
         io.to(receivedRoom).emit("message", { room, newData });
         console.log(`Message received in room ${receivedRoom}: ${message}`);
       } catch (error) {
         console.error("Error occurred while handling sendMessage:", error);
       }
+    });
+
+    socket.on("makeRoom", async (data) => {
+      let { loginedUser, selectedUser } = data;
+      console.log("makeroomdata", data);
+
+      loginedUser = await User.findOne({ email: loginedUser.email });
+      selectedUser = await User.findOne({ email: selectedUser.email });
+
+      const existingRoom = await Room.findOne({
+        members: { $all: [loginedUser._id, selectedUser._id] },
+      });
+
+      if (existingRoom) {
+        io.emit("makeRoomResponse", { room: existingRoom });
+      } else {
+        const newRoom = new Room({
+          name: `${loginedUser.email}-${selectedUser.email}`,
+          members: [loginedUser._id, selectedUser._id],
+        });
+        await newRoom.save();
+        loginedUser.rooms.push(newRoom._id);
+        await loginedUser.save();
+        selectedUser.rooms.push(newRoom._id);
+        await selectedUser.save();
+        console.log("usersss:", loginedUser, selectedUser);
+        io.emit("makeRoomResponse", { room: newRoom });
+      }
+      socket.on("disconnect", () => {
+        console.log("User disconnected");
+      });
     });
     socket.on("disconnect", () => {
       console.log("User disconnected");
