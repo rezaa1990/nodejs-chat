@@ -54,7 +54,7 @@ function initializeSocket(server) {
       });
 
       if (existingRoom) {
-        io.emit("makeRoomResponse", { room: existingRoom });
+        io.emit("makeRoomResponse", { room: existingRoom, loginedUser });
       } else {
         const newRoom = new Room({
           name: `${loginedUser.email}-${selectedUser.email}`,
@@ -66,7 +66,7 @@ function initializeSocket(server) {
         selectedUser.rooms.push(newRoom._id);
         await selectedUser.save();
         console.log("usersss:", loginedUser, selectedUser);
-        io.emit("makeRoomResponse", { room: newRoom });
+        io.emit("makeRoomResponse", { room: newRoom , loginedUser});
       }
       socket.on("disconnect", () => {
         console.log("User disconnected");
